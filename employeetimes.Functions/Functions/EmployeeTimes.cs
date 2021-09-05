@@ -141,5 +141,33 @@ namespace employeetimes.Functions.Functions
             });
         }
 
+        [FunctionName(nameof(GetTimeRecordById))]
+        public static IActionResult GetTimeRecordById(
+             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "time-record/{id}")] HttpRequest req,
+             [Table("timerecord", "TIMERECORD", "{id}", Connection = "AzureWebJobsStorage")] TimeRecordEntity timeRecordEntity,
+             string id,
+             ILogger log)
+        {
+            log.LogInformation($"Get time record by id : {id}");
+
+            if (timeRecordEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    IsSuccess = false,
+                    Message = "Time record not found."
+                });
+            }
+
+            string message = $"Todo: {timeRecordEntity.RowKey} retrieved";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = timeRecordEntity
+            });
+        }
     }
 }
