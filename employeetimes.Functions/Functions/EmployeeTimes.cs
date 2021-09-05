@@ -168,6 +168,42 @@ namespace employeetimes.Functions.Functions
                 Message = message,
                 Result = timeRecordEntity
             });
+
+
+        }
+
+
+        [FunctionName(nameof(DeleteTimeRecord))]
+        public static async Task<IActionResult> DeleteTimeRecord(
+             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "time-record/{id}")] HttpRequest req,
+             [Table("timerecord", "TIMERECORD", "{id}", Connection = "AzureWebJobsStorage")] TimeRecordEntity timeRecordEntity,
+             [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable TimeRecordTable,
+
+             string id,
+              ILogger log)
+        {
+            log.LogInformation($"Delete todo id : {id}, received");
+
+            if (timeRecordEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    IsSuccess = false,
+                    Message = "Todo not found."
+                });
+            }
+
+            await TimeRecordTable.ExecuteAsync(TableOperation.Delete(timeRecordEntity));
+
+            string message = $"Todo: {timeRecordEntity.RowKey} deleted";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = timeRecordEntity
+            });
         }
     }
 }
