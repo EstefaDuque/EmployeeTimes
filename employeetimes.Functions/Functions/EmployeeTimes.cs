@@ -41,7 +41,7 @@ namespace employeetimes.Functions.Functions
             TimeRecordEntity timeRecordEntity = new TimeRecordEntity
             {
                 EmployeeId = timeRecord.EmployeeId,
-                Date = timeRecord.Date,
+                Date = (DateTime)timeRecord.Date,
                 Type = timeRecord.Type,
                 ETag = "*",
                 PartitionKey = "TIMERECORD",
@@ -67,7 +67,7 @@ namespace employeetimes.Functions.Functions
         [FunctionName(nameof(UpdateTimeRecord))]
         public static async Task<IActionResult> UpdateTimeRecord(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "time-record/{id}")] HttpRequest req,
-            [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable todoTable,
+            [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable timeRecordTable,
             string id,
             ILogger log)
         {
@@ -77,7 +77,7 @@ namespace employeetimes.Functions.Functions
             TimeRecord timeRecord = JsonConvert.DeserializeObject<TimeRecord>(requestBody);
 
             TableOperation findOperation = TableOperation.Retrieve<TimeRecordEntity>("TIMERECORD", id);
-            TableResult findResult = await todoTable.ExecuteAsync(findOperation);
+            TableResult findResult = await timeRecordTable.ExecuteAsync(findOperation);
 
             if (findResult.Result == null)
             {
@@ -92,7 +92,7 @@ namespace employeetimes.Functions.Functions
 
             if (!(timeRecord?.Date == null))
             {
-                timeRecordEntity.Date = timeRecord.Date;
+                timeRecordEntity.Date = (DateTime)timeRecord.Date;
             }
 
             if (!(timeRecord?.Type == null))
@@ -105,7 +105,7 @@ namespace employeetimes.Functions.Functions
                 timeRecordEntity.EmployeeId = timeRecord.EmployeeId;
             }
             TableOperation replaceOperation = TableOperation.Replace(timeRecordEntity);
-            await todoTable.ExecuteAsync(replaceOperation);
+            await timeRecordTable.ExecuteAsync(replaceOperation);
 
             string message = $"TimeRecord: {id}, updated in table";
             log.LogInformation(message);
@@ -122,15 +122,15 @@ namespace employeetimes.Functions.Functions
         [FunctionName(nameof(GetAllTimeRecords))]
         public static async Task<IActionResult> GetAllTimeRecords(
              [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "time-record")] HttpRequest req,
-             [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable todoTable,
+             [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable timeRecordTable,
              ILogger log)
         {
             log.LogInformation("Get all time records received.");
 
             TableQuery<TimeRecordEntity> query = new TableQuery<TimeRecordEntity>();
-            TableQuerySegment<TimeRecordEntity> timeRecords = await todoTable.ExecuteQuerySegmentedAsync(query, null);
+            TableQuerySegment<TimeRecordEntity> timeRecords = await timeRecordTable.ExecuteQuerySegmentedAsync(query, null);
 
-            string message = "Retrieved all todos.";
+            string message = "Retrieved all time records.";
             log.LogInformation(message);
 
             return new OkObjectResult(new Response
@@ -159,7 +159,7 @@ namespace employeetimes.Functions.Functions
                 });
             }
 
-            string message = $"Todo: {timeRecordEntity.RowKey} retrieved";
+            string message = $"Time record: {timeRecordEntity.RowKey} retrieved";
             log.LogInformation(message);
 
             return new OkObjectResult(new Response
@@ -182,20 +182,20 @@ namespace employeetimes.Functions.Functions
              string id,
               ILogger log)
         {
-            log.LogInformation($"Delete todo id : {id}, received");
+            log.LogInformation($"Delete time record id : {id}, received");
 
             if (timeRecordEntity == null)
             {
                 return new BadRequestObjectResult(new Response
                 {
                     IsSuccess = false,
-                    Message = "Todo not found."
+                    Message = "Time record not found."
                 });
             }
 
             await TimeRecordTable.ExecuteAsync(TableOperation.Delete(timeRecordEntity));
 
-            string message = $"Todo: {timeRecordEntity.RowKey} deleted";
+            string message = $"Time record: {timeRecordEntity.RowKey} deleted";
             log.LogInformation(message);
 
             return new OkObjectResult(new Response
