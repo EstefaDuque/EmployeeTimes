@@ -7,8 +7,8 @@ namespace employeetimes.Functions.Entities
 {
     public class ConsolidatedEntity: TableEntity
     {
-        public int EmployeeId { get; set; }
-        public DateTime Date { get; set; }
-        public int MinutesWork { get; set; }
+        public int? EmployeeId { get; set; }
+        public DateTime? Date { get; set; }
+        public int? MinutesWork { get; set; }
     }
 }

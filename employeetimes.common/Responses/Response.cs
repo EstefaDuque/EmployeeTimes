@@ -8,4 +8,3 @@
         public object Result { get; set; }
     }
 }
-}

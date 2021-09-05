@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "employeetimes.common", "emp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "employeetimes.Functions", "employeetimes.Functions\employeetimes.Functions.csproj", "{76B7FBAB-FD1F-4992-B416-5043B5D62D05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "employeetimes.Test", "employeetimes.Test\employeetimes.Test.csproj", "{5F65C5AE-9F49-49AB-A1B7-6A06690B16DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "employeetimes.Test", "employeetimes.Test\employeetimes.Test.csproj", "{5F65C5AE-9F49-49AB-A1B7-6A06690B16DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83889423-1B64-4B9B-9372-5FC2077A9E89}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
