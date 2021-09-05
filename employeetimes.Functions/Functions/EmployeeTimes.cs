@@ -118,5 +118,28 @@ namespace employeetimes.Functions.Functions
             });
         }
 
+
+        [FunctionName(nameof(GetAllTimeRecords))]
+        public static async Task<IActionResult> GetAllTimeRecords(
+             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "time-record")] HttpRequest req,
+             [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable todoTable,
+             ILogger log)
+        {
+            log.LogInformation("Get all time records received.");
+
+            TableQuery<TimeRecordEntity> query = new TableQuery<TimeRecordEntity>();
+            TableQuerySegment<TimeRecordEntity> timeRecords = await todoTable.ExecuteQuerySegmentedAsync(query, null);
+
+            string message = "Retrieved all todos.";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = timeRecords
+            });
+        }
+
     }
 }
