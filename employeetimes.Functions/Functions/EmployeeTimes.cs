@@ -62,5 +62,61 @@ namespace employeetimes.Functions.Functions
                 Result = timeRecordEntity
             });
         }
+
+
+        [FunctionName(nameof(UpdateTimeRecord))]
+        public static async Task<IActionResult> UpdateTimeRecord(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "time-record/{id}")] HttpRequest req,
+            [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable todoTable,
+            string id,
+            ILogger log)
+        {
+            log.LogInformation($"Update for time record: {id}, received");
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            TimeRecord timeRecord = JsonConvert.DeserializeObject<TimeRecord>(requestBody);
+
+            TableOperation findOperation = TableOperation.Retrieve<TimeRecordEntity>("TIMERECORD", id);
+            TableResult findResult = await todoTable.ExecuteAsync(findOperation);
+
+            if (findResult.Result == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    IsSuccess = false,
+                    Message = "TimeRecord not found."
+                });
+            }
+
+            TimeRecordEntity timeRecordEntity = (TimeRecordEntity)findResult.Result;
+
+            if (!(timeRecord?.Date == null))
+            {
+                timeRecordEntity.Date = timeRecord.Date;
+            }
+
+            if (!(timeRecord?.Type == null))
+            {
+                timeRecordEntity.Type = timeRecord.Type;
+            }
+
+            if (!(timeRecord?.EmployeeId == null))
+            {
+                timeRecordEntity.EmployeeId = timeRecord.EmployeeId;
+            }
+            TableOperation replaceOperation = TableOperation.Replace(timeRecordEntity);
+            await todoTable.ExecuteAsync(replaceOperation);
+
+            string message = $"TimeRecord: {id}, updated in table";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = timeRecordEntity
+            });
+        }
+
     }
 }
