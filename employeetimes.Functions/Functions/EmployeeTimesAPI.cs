@@ -106,6 +106,11 @@ namespace employeetimes.Functions.Functions
             {
                 timeRecordEntity.EmployeeId = timeRecord.EmployeeId;
             }
+            if (!(timeRecord?.Consolidated == null))
+            {
+                timeRecordEntity.Consolidated = timeRecord.Consolidated;
+            }
+
             TableOperation replaceOperation = TableOperation.Replace(timeRecordEntity);
             await timeRecordTable.ExecuteAsync(replaceOperation);
 
