@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace employeetimes.Functions.Functions
 {
-    public static class EmployeeTimes
+    public static class EmployeeTimesAPI
     {
         [FunctionName(nameof(CreateTimeRecord))]
         public static async Task<IActionResult> CreateTimeRecord(
@@ -180,8 +180,7 @@ namespace employeetimes.Functions.Functions
              [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "time-record/{id}")] HttpRequest req,
              [Table("timerecord", "TIMERECORD", "{id}", Connection = "AzureWebJobsStorage")] TimeRecordEntity timeRecordEntity,
              [Table("timerecord", Connection = "AzureWebJobsStorage")] CloudTable TimeRecordTable,
-
-             string id,
+              string id,
               ILogger log)
         {
             log.LogInformation($"Delete time record id : {id}, received");
@@ -208,30 +207,5 @@ namespace employeetimes.Functions.Functions
             });
         }
 
-
-
-
-        [FunctionName(nameof(GetConsolidatedByDate))]
-        public static async Task<IActionResult> GetConsolidatedByDate(
-             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "consolidated/{date}")] HttpRequest req,
-             [Table("consolidated", Connection = "AzureWebJobsStorage")] CloudTable consolidatedTable,
-             DateTime date,
-             ILogger log)
-        {
-            string filter = TableQuery.GenerateFilterConditionForDate("Date", QueryComparisons.Equal, date);
-
-            TableQuery<ConsolidatedEntity> query = new TableQuery<ConsolidatedEntity>().Where(filter);
-            TableQuerySegment<ConsolidatedEntity> consolidatedTimeRecords = await consolidatedTable.ExecuteQuerySegmentedAsync(query, null);
-
-            string message = $"Get all consolidated by date: {date}";
-            log.LogInformation(message);
-
-            return new OkObjectResult(new Response
-            {
-                IsSuccess = true,
-                Message = message,
-                Result = consolidatedTimeRecords
-            });
-        }
     }
 }
