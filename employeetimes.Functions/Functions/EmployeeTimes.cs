@@ -41,7 +41,7 @@ namespace employeetimes.Functions.Functions
             TimeRecordEntity timeRecordEntity = new TimeRecordEntity
             {
                 EmployeeId = timeRecord.EmployeeId,
-                Date = (DateTime)timeRecord.Date,
+                Date = ((DateTime)timeRecord.Date).AddHours(-5),
                 Type = timeRecord.Type,
                 ETag = "*",
                 PartitionKey = "TIMERECORD",
@@ -92,7 +92,9 @@ namespace employeetimes.Functions.Functions
 
             if (!(timeRecord?.Date == null))
             {
-                timeRecordEntity.Date = (DateTime)timeRecord.Date;
+
+                timeRecordEntity.Date = ((DateTime)timeRecord.Date).AddHours(-5);
+
             }
 
             if (!(timeRecord?.Type == null))
@@ -203,6 +205,32 @@ namespace employeetimes.Functions.Functions
                 IsSuccess = true,
                 Message = message,
                 Result = timeRecordEntity
+            });
+        }
+
+
+
+
+        [FunctionName(nameof(GetConsolidatedByDate))]
+        public static async Task<IActionResult> GetConsolidatedByDate(
+             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "consolidated/{date}")] HttpRequest req,
+             [Table("consolidated", Connection = "AzureWebJobsStorage")] CloudTable consolidatedTable,
+             DateTime date,
+             ILogger log)
+        {
+            string filter = TableQuery.GenerateFilterConditionForDate("Date", QueryComparisons.Equal, date);
+
+            TableQuery<ConsolidatedEntity> query = new TableQuery<ConsolidatedEntity>().Where(filter);
+            TableQuerySegment<ConsolidatedEntity> consolidatedTimeRecords = await consolidatedTable.ExecuteQuerySegmentedAsync(query, null);
+
+            string message = $"Get all consolidated by date: {date}";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                IsSuccess = true,
+                Message = message,
+                Result = consolidatedTimeRecords
             });
         }
     }
