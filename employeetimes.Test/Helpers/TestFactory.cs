@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace employeetimes.Test.Helpers
@@ -16,7 +17,7 @@ namespace employeetimes.Test.Helpers
         {
             return new TimeRecordEntity
             {
-                
+
                 ETag = "*",
                 PartitionKey = "TIMERECORD",
                 RowKey = Guid.NewGuid().ToString(),
@@ -24,10 +25,43 @@ namespace employeetimes.Test.Helpers
                 Date = DateTime.UtcNow,
                 Consolidated = false,
                 Type = 0
-                
+
             };
         }
 
+        public static List<TimeRecordEntity> GetTimeRecordsEntity()
+        {
+            return new List<TimeRecordEntity> {
+            new TimeRecordEntity
+                {
+
+                ETag = "*",
+                PartitionKey = "TIMERECORD",
+                RowKey = Guid.NewGuid().ToString(),
+                EmployeeId = 1,
+                Date = DateTime.UtcNow,
+                Consolidated = false,
+                Type = 0
+                }
+
+            };
+        }
+        public static List<ConsolidatedEntity> GetConsolidatedListEntity()
+        {
+            return new List<ConsolidatedEntity> {
+            new ConsolidatedEntity
+                {
+
+                ETag = "*",
+                PartitionKey = "TIMERECORD",
+                RowKey = Guid.NewGuid().ToString(),
+                EmployeeId = 1,
+                Date = DateTime.UtcNow,
+                MinutesWork=180
+                }
+
+            };
+        }
         public static ConsolidatedEntity GetConsolidatedEntity()
         {
             return new ConsolidatedEntity
@@ -38,7 +72,7 @@ namespace employeetimes.Test.Helpers
                 RowKey = Guid.NewGuid().ToString(),
                 EmployeeId = 1,
                 Date = DateTime.UtcNow,
-                MinutesWork =180
+                MinutesWork = 180
 
             };
         }
@@ -59,7 +93,6 @@ namespace employeetimes.Test.Helpers
                 Path = $"/${date}"
             };
         }
-
 
         public static DefaultHttpRequest CreateHttpRequest(Guid employeekey)
         {

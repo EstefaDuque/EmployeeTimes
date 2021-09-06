@@ -56,8 +56,6 @@ namespace employeetimes.Functions.Functions
 
                         if (record != null)
                         {
-                            log.LogInformation("ingrese");
-
                             record.MinutesWork += minutesWork;
                             TableOperation replaceOperation3 = TableOperation.Replace(record);
                             await consolidatedTable.ExecuteAsync(replaceOperation3);
@@ -82,12 +80,6 @@ namespace employeetimes.Functions.Functions
                 }
             }
         }
-
-
-
-
     }
-
-
 }
 

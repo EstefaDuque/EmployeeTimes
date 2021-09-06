@@ -2,6 +2,8 @@
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace employeetimes.Test.Helpers
@@ -29,6 +31,15 @@ namespace employeetimes.Test.Helpers
                 HttpStatusCode = 200,
                 Result = TestFactory.GetTimeRecordEntity()
             });
+        }
+
+        public override async Task<TableQuerySegment<RecordEntity>> ExecuteQuerySegmentedAsync<RecordEntity>(TableQuery<RecordEntity> query, TableContinuationToken token)
+        {
+            ConstructorInfo constructor = typeof(TableQuerySegment<RecordEntity>)
+                   .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+                   .FirstOrDefault(c => c.GetParameters().Count() == 1);
+
+            return await Task.FromResult(constructor.Invoke(new object[] { TestFactory.GetTimeRecordsEntity() }) as TableQuerySegment<RecordEntity>);
         }
     }
 }

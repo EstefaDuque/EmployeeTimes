@@ -2,11 +2,13 @@
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace employeetimes.Test.Helpers
 {
-    public class MockCloudTableConsolidated: CloudTable
+    public class MockCloudTableConsolidated : CloudTable
     {
         public MockCloudTableConsolidated(Uri tableAddress) : base(tableAddress)
         {
@@ -29,6 +31,15 @@ namespace employeetimes.Test.Helpers
                 HttpStatusCode = 200,
                 Result = TestFactory.GetConsolidatedEntity()
             });
+        }
+
+        public override async Task<TableQuerySegment<ConsolidatedEntity>> ExecuteQuerySegmentedAsync<ConsolidatedEntity>(TableQuery<ConsolidatedEntity> query, TableContinuationToken token)
+        {
+            ConstructorInfo constructor = typeof(TableQuerySegment<ConsolidatedEntity>)
+                   .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+                   .FirstOrDefault(c => c.GetParameters().Count() == 1);
+
+            return await Task.FromResult(constructor.Invoke(new object[] { TestFactory.GetConsolidatedListEntity() }) as TableQuerySegment<ConsolidatedEntity>);
         }
     }
 }

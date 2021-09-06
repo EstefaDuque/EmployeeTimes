@@ -1,11 +1,9 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace employeetimes.Functions.Entities
 {
-    public class ConsolidatedEntity: TableEntity
+    public class ConsolidatedEntity : TableEntity
     {
         public int EmployeeId { get; set; }
         public DateTime Date { get; set; }
